@@ -17,6 +17,14 @@ function App() {
   const [activeSummaryId, setActiveSummaryId] = useState(null);
   const [prefilledCategory, setPrefilledCategory] = useState(null);
   const [quizResults, setQuizResults] = useState(null);
+  const [tests, setTests] = useState(() => {
+    const saved = localStorage.getItem('savedTests');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const handleAddTest = (newTest) => {
+    setTests(prev => [newTest, ...prev]);
+  };
 
   const handleNavigate = (tab, payload) => {
     setActiveTab(tab);
@@ -37,6 +45,7 @@ function App() {
           <TestGeneration
             onNavigate={handleNavigate}
             prefilledCategory={prefilledCategory}
+            onAddTest={handleAddTest}
           />
         );
       case 'summary_detail':
@@ -51,11 +60,16 @@ function App() {
       case 'quiz':
         return <Quiz onNavigate={handleNavigate} />;
       case 'study':
-        return <MyTests onNavigate={handleNavigate} />;
+        return <MyTests tests={tests} onNavigate={handleNavigate} />;
       case 'mytests':
-        return <MyTests onNavigate={handleNavigate} />;
+        return <MyTests tests={tests} onNavigate={handleNavigate} />;
       case 'solve':
-        return <TestSolving activeTestId={activeTestId} onNavigate={handleNavigate} />;
+        return (
+          <TestSolving 
+            activeTest={tests.find(t => t.id === activeTestId)} 
+            onNavigate={handleNavigate} 
+          />
+        );
       case 'result':
         return <ResultReport results={quizResults} onNavigate={handleNavigate} />;
       case 'remind':

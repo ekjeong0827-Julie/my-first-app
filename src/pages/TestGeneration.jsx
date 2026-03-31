@@ -29,21 +29,43 @@ const TestGeneration = ({ onNavigate, prefilledCategory, onAddTest }) => {
     }
 
     setIsGenerating(true);
+    
+    // YYYYMMDDHHMMSS format helper
+    const getFormattedDate = () => {
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    };
+
+    const timestamp = getFormattedDate();
+
     // Mock generation delay
     setTimeout(() => {
       setIsGenerating(false);
+
+      const newTestData = {
+        id: Date.now(),
+        title: testName,
+        questionCount: questionCount,
+        categories: selectedCategories,
+        questionType: questionType,
+        optionType: optionType,
+        answerView: answerView,
+        createdAt: timestamp,
+        status: '미응시',
+        date: new Date().toLocaleDateString()
+      };
+
+      // Save to localStorage
+      const existingTests = JSON.parse(localStorage.getItem('savedTests') || '[]');
+      const updatedTests = [newTestData, ...existingTests];
+      localStorage.setItem('savedTests', JSON.stringify(updatedTests));
       
       if (onAddTest) {
-        onAddTest({
-          title: testName,
-          questionCount: questionCount,
-          categories: selectedCategories,
-          date: '방금 전',
-          status: '미응시'
-        });
+        onAddTest(newTestData);
       }
 
-      alert(`[${testName}] 문제 생성이 완료되었습니다!\n(내 시험지 페이지로 이동합니다.)`);
+      alert(`[${testName}] 문제 생성이 완료되었습니다!\n생성일시: ${timestamp}\n(내 시험지 페이지로 이동합니다.)`);
       if (onNavigate) onNavigate('mytests'); // Switch to the new tab
     }, 1000);
   };
