@@ -1,0 +1,188 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
+/* ─── Design Tokens ─── */
+:root {
+  --primary: #2962FF;
+  --primary-dark: #1A237E;
+  --primary-light: #E8EEFF;
+  --primary-glow: rgba(41, 98, 255, 0.18);
+
+  --success: #00C853;
+  --success-bg: #E8FBF0;
+  --danger: #FF5252;
+  --danger-bg: #FFF0F0;
+  --warning-bg: #FFF9C4;
+
+  --bg: #F8F9FA;
+  --surface: #FFFFFF;
+  --surface-2: #F0F4FF;
+  --border: #E8ECF4;
+
+  --text: #0F1D3B;
+  --text-sub: #4A5578;
+  --text-muted: #8A94B2;
+
+  --shadow-sm: 0 1px 3px rgba(15, 29, 59, 0.06);
+  --shadow-md: 0 4px 16px rgba(15, 29, 59, 0.10);
+  --shadow-lg: 0 12px 40px rgba(41, 98, 255, 0.15);
+  --shadow-card: 0 2px 12px rgba(15, 29, 59, 0.08);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  --nav-height: 72px;
+}
+
+/* ─── Dark Mode ─── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #5C8CFF;
+    --primary-dark: #3D5AFE;
+    --primary-light: #1A2140;
+    --primary-glow: rgba(92, 140, 255, 0.20);
+
+    --success: #00E676;
+    --success-bg: #0A2A1A;
+    --danger: #FF6B6B;
+    --danger-bg: #2A0A0A;
+    --warning-bg: #2A2400;
+
+    --bg: #0B0F1A;
+    --surface: #131929;
+    --surface-2: #1A2140;
+    --border: #232D4A;
+
+    --text: #EEF2FF;
+    --text-sub: #9AABD4;
+    --text-muted: #546080;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 12px 40px rgba(92, 140, 255, 0.15);
+    --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* ─── Reset ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+button {
+  border: none;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+input, textarea {
+  font-family: inherit;
+}
+
+/* ─── Mobile Shell ─── */
+.mobile-container {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg);
+  min-height: 100vh;
+  position: relative;
+  box-shadow: 0 0 60px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+/* ─── Typography ─── */
+.h1 { font-size: 22px; font-weight: 700; line-height: 1.3; }
+.h2 { font-size: 18px; font-weight: 700; line-height: 1.3; }
+.h3 { font-size: 16px; font-weight: 600; line-height: 1.4; }
+.body { font-size: 15px; font-weight: 400; line-height: 1.65; }
+.caption { font-size: 13px; font-weight: 500; line-height: 1.4; }
+.micro  { font-size: 12px; font-weight: 500; line-height: 1.4; }
+
+/* ─── Keyword Highlight ─── */
+.keyword {
+  background: var(--warning-bg);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-weight: 600;
+}
+
+/* ─── Utility Animations ─── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 var(--primary-glow); }
+  50%       { box-shadow: 0 0 0 10px transparent; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes progress-fill {
+  from { width: 0; }
+}
+
+.animate-fade-up { animation: fadeInUp 0.35s ease both; }
+.animate-scale   { animation: scaleIn 0.25s ease both; }
+.shake           { animation: shake 0.4s ease; }

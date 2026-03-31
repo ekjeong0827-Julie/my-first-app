@@ -1,0 +1,134 @@
+.solve-container {
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease;
+  padding-bottom: 20px;
+}
+
+.solve-header {
+  margin-bottom: 24px;
+}
+
+.solve-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.solve-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.question-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.question-card {
+  background: var(--surface-color);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.question-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-btn {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-main);
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.option-btn:not(:disabled):hover, .option-btn:not(:disabled):active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.option-btn.selected-correct {
+  background: #dcfce7;
+  border-color: #22c55e;
+  color: #166534;
+}
+
+.option-btn.selected-wrong {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+.option-btn.correct-reveal {
+  background: #dcfce7;
+  border-color: #22c55e;
+  color: #166534;
+}
+
+.option-btn:disabled {
+  cursor: default;
+}
+
+.feedback-msg {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  font-size: 1.05rem;
+  text-align: center;
+  animation: slideUp 0.3s ease;
+}
+
+.feedback-msg.correct {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.feedback-msg.wrong {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.finish-btn {
+  margin-top: 32px;
+  background-color: var(--primary);
+  color: white;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  font-size: 1.05rem;
+  font-weight: 700;
+  box-shadow: 0 4px 14px 0 rgba(2, 132, 199, 0.39);
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.finish-btn:active {
+  transform: translateY(1px);
+}

@@ -1,0 +1,154 @@
+.detail-container {
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease;
+  padding-bottom: 30px;
+}
+
+.back-btn {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  color: var(--primary);
+  font-weight: 700;
+  background: none;
+  font-size: 1rem;
+  transition: opacity 0.2s;
+}
+
+.back-btn:active {
+  opacity: 0.7;
+}
+
+.back-btn svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+  margin-right: 4px;
+}
+
+.detail-header {
+  margin-bottom: 24px;
+}
+
+.detail-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 12px;
+  line-height: 1.35;
+  letter-spacing: -0.5px;
+}
+
+.detail-tags {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.detail-toc {
+  background: var(--primary-light);
+  border: 1px solid #bae6fd;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.toc-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.toc-title svg {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  fill: currentColor;
+}
+
+.toc-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.toc-item {
+  color: var(--text-main);
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  display: flex;
+  font-weight: 600;
+}
+
+.toc-item::before {
+  content: '•';
+  color: var(--primary);
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.content-section {
+  background: var(--surface-color);
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.section-heading {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 14px;
+  border-bottom: 2px solid var(--bg-color);
+  padding-bottom: 8px;
+}
+
+.section-points {
+  padding-left: 20px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.section-points li {
+  margin-bottom: 8px;
+}
+
+.generate-floating-btn {
+  position: absolute;
+  bottom: 85px;
+  right: 20px;
+  background: var(--primary);
+  color: white;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  transition: transform 0.2s;
+}
+
+.generate-floating-btn:active {
+  transform: scale(0.95);
+}
+
+.generate-floating-btn svg {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+}
