@@ -8,6 +8,7 @@ import TestSolving from './pages/TestSolving';
 import SummaryDetail from './pages/SummaryDetail';
 import ExamList from './pages/ExamList';
 import Quiz from './pages/Quiz';
+import ResultReport from './pages/ResultReport';
 import './index.css';
 
 function App() {
@@ -15,12 +16,14 @@ function App() {
   const [activeTestId, setActiveTestId] = useState(null);
   const [activeSummaryId, setActiveSummaryId] = useState(null);
   const [prefilledCategory, setPrefilledCategory] = useState(null);
+  const [quizResults, setQuizResults] = useState(null);
 
   const handleNavigate = (tab, payload) => {
     setActiveTab(tab);
     if (tab === 'solve') setActiveTestId(payload);
     if (tab === 'summary_detail') setActiveSummaryId(payload);
     if (tab === 'test' && payload) setPrefilledCategory(payload);
+    if (tab === 'result') setQuizResults(payload);
   };
 
   const renderContent = () => {
@@ -53,6 +56,8 @@ function App() {
         return <MyTests onNavigate={handleNavigate} />;
       case 'solve':
         return <TestSolving activeTestId={activeTestId} onNavigate={handleNavigate} />;
+      case 'result':
+        return <ResultReport results={quizResults} onNavigate={handleNavigate} />;
       case 'remind':
         return (
           <div style={{ padding: '60px 24px', textAlign: 'center', color: 'var(--text-muted)' }}>

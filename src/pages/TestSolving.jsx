@@ -91,8 +91,20 @@ const TestSolving = ({ activeTest, onNavigate }) => {
         })}
       </div>
 
-      <button className="finish-btn" onClick={() => onNavigate('mytests')}>
-        시험 종료하고 나가기
+      <button className="finish-btn" onClick={() => {
+        const total = questions.length;
+        const correctCount = questions.filter(q => answers[q.id] === q.correctIndex).length;
+        const score = Math.round((correctCount / total) * 100);
+        
+        onNavigate('result', {
+          score,
+          total,
+          correctCount,
+          weakKeywords: ['핵심 개념', '분석'], // Mock keywords for now as it's a demo
+          type: 'solve'
+        });
+      }}>
+        시험 결과 보기 🏁
       </button>
     </div>
   );

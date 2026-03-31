@@ -311,7 +311,17 @@ const Quiz = ({ onNavigate, examConfig }) => {
 
   const handleNext = () => {
     if (idx + 1 >= total) {
-      setQuizDone(true);
+      const correctCount = results.filter(r => r.correct).length;
+      const score = Math.round((correctCount / total) * 100);
+      const weakKeywords = results.filter(r => !r.correct).map(r => r.keyword);
+      
+      onNavigate('result', {
+        score,
+        total,
+        correctCount,
+        weakKeywords,
+        type: 'quiz'
+      });
     } else {
       setIdx(i => i + 1);
       setSelected(null);
@@ -322,60 +332,7 @@ const Quiz = ({ onNavigate, examConfig }) => {
     }
   };
 
-  // 퀴즈 완료 → 결과 요약 내부 렌더
-  if (quizDone) {
-    const correctCount = results.filter(r => r.correct).length;
-    const score = Math.round((correctCount / total) * 100);
-    const wrong = results.filter(r => !r.correct).map(r => r.keyword);
-    return (
-      <div className="quiz-result animate-fade-up">
-        <div className="quiz-result__score-wrap">
-          <div className="quiz-result__circle">
-            <svg viewBox="0 0 120 120">
-              <circle cx="60" cy="60" r="50" className="result-ring__track"/>
-              <circle
-                cx="60" cy="60" r="50"
-                className="result-ring__fill"
-                strokeDasharray={`${314 * score / 100} 314`}
-                transform="rotate(-90 60 60)"
-              />
-            </svg>
-            <span className="quiz-result__score">{score}</span>
-            <span className="quiz-result__score-lbl">점</span>
-          </div>
-          <p className="quiz-result__msg">
-            {score >= 90 ? '🏆 완벽합니다!' : score >= 70 ? '👍 훌륭해요!' : '💪 조금만 더!'}
-          </p>
-          <p className="quiz-result__sub">{total}문제 중 {correctCount}개 정답</p>
-        </div>
 
-        {wrong.length > 0 && (
-          <div className="quiz-result__weak">
-            <h3 className="quiz-result__weak-title">취약 키워드</h3>
-            <div className="quiz-result__weak-list">
-              {wrong.map((kw, i) => (
-                <span key={i} className="quiz-result__weak-tag">
-                  #{kw}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="quiz-result__actions">
-          <button className="quiz-result__btn quiz-result__btn--ghost" onClick={() => {
-            setIdx(0); setResults([]); setSelected(null); setShortVal('');
-            setSubmitted(false); setIsCorrect(null); setShowSource(false); setQuizDone(false);
-          }}>
-            다시 풀기
-          </button>
-          <button className="quiz-result__btn quiz-result__btn--primary" onClick={() => onNavigate && onNavigate('home')}>
-            홈으로
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   const canSubmit = q.type === 'short'
     ? shortVal.trim().length > 0
