@@ -11,6 +11,11 @@ const MOCK_QUESTIONS = [
     source: '1920년대 문화통치기 저항 단원 중, 의열단은 1919년 11월 김원봉이 만주 지린(吉林)에서 결성하였다. 폭력적 투쟁 방식을 채택하여 일제 요인 암살과 주요 시설 폭파를 주요 활동으로 삼았다.',
     sourceHighlight: '1919년 11월 김원봉이 만주 지린(吉林)에서 결성하였다.',
     keyword: '의열단 결성',
+    references: [
+      { title: '한국민족문화대백과사전 - 의열단', url: 'https://encykorea.aks.ac.kr/Contents/Item/E0043329' },
+      { title: '우리역사넷 - 의열단 결성과 활동', url: 'http://contents.history.go.kr/mobile/nh/view.do?levelId=nh_043_0030_0010_0010' },
+      { title: '독립기념관 - 의열투쟁의 전개', url: 'https://i815.or.kr/kor/content/contents.do?v_menu_code=01020202' }
+    ]
   },
   {
     id: 2,
@@ -23,9 +28,14 @@ const MOCK_QUESTIONS = [
       '조선총독에 문관 출신만 임명 허용',
     ],
     answer: 1,
-    source: '3.1 운동 이후 일제는 기존의 헌병 경찰 제도를 보통 경찰 제도로 바꾸고, 이른바 "문화통치"를 표방하였다. 그러나 이는 표면적 유화책에 불과했으며, 오히려 경찰 수를 대폭 늘려 감시를 강화하였다.',
+    source: '3.1 운동 이후 일제는 기존의 헌병 경찰 제도가 보통 경찰 제도로 바꾸고, 이른바 "문화통치"를 표방하였다. 그러나 이는 표면적 유화책에 불과했으며, 오히려 경찰 수를 대폭 늘려 감시를 강화하였다.',
     sourceHighlight: '헌병 경찰 제도를 보통 경찰 제도로 바꾸고, "문화통치"를 표방하였다.',
     keyword: '문화통치',
+    references: [
+      { title: '국사편찬위원회 - 1920년대 문화통치', url: 'http://contents.history.go.kr/mobile/ni/view.do?levelId=ni_001_0010' },
+      { title: '네이버 지식백과 - 문화통치', url: 'https://terms.naver.com/entry.naver?docId=1095116' },
+      { title: '역사 에듀 - 일제의 통치 체제 변화', url: 'https://historyedu.co.kr/1920s-rule/' }
+    ]
   },
   {
     id: 3,
@@ -42,6 +52,11 @@ const MOCK_QUESTIONS = [
     source: '봉오동 전투는 1920년 6월, 홍범도가 이끄는 대한독립군과 여러 독립군 연합 부대가 일본군 추격대를 봉오동 골짜기에 유인하여 대파한 전투이다. 이는 독립군의 첫 대규모 승리로 기록된다.',
     sourceHighlight: '홍범도가 이끄는 대한독립군이 일본군 추격대를 봉오동 골짜기에 유인하여 대파한 전투이다.',
     keyword: '봉오동 전투',
+    references: [
+      { title: '위키백과 - 봉오동 전투', url: 'https://ko.wikipedia.org/wiki/봉오동_전투' },
+      { title: '홍범도 장군 기념사업회', url: 'http://www.hongbumdo.org/' },
+      { title: '국가보훈부 - 이달의 독립운동가 홍범도', url: 'https://www.mpva.go.kr/mpva/contents/contentsView.do?mCode=MC04010100' }
+    ]
   },
   {
     id: 4,
@@ -57,15 +72,25 @@ const MOCK_QUESTIONS = [
     source: '대한민국 임시정부는 1940년 충칭에서 한국광복군을 창설하였다. 지청천을 총사령관으로 임명하였으며, 미국 OSS와 협력하여 국내 진입 작전을 계획하였으나 광복으로 실현되지 못하였다.',
     sourceHighlight: '1940년 충칭에서 한국광복군을 창설하였다.',
     keyword: '한국광복군',
+    references: [
+      { title: '대한민국 임시정부 기념관', url: 'https://nmip.mpva.go.kr/' },
+      { title: '한국광복군 창설과 활동 개요', url: 'http://contents.history.go.kr/mobile/nh/view.do?levelId=nh_044_0040_0010' },
+      { title: '지식백과 - 한국광복군', url: 'https://terms.naver.com/entry.naver?docId=1161175' }
+    ]
   },
   {
     id: 5,
     type: 'ox',
     question: '청산리 대첩(1920)은 김좌진이 지휘하는 북로군정서군이 주도한 전투이다.',
     answer: true,
-    source: '청산리 대첩은 1920년 10월, 김좌진의 북로군정서와 홍범도의 대한독립군 등 연합 부대가 백두산 인근 청산리 일대에서 일본군과 벌인 전투이다. 6일간의 전투에서 대규모 독립군 승리를 거두었다.',
+    source: '청산리 대첩은 1920년 10월, 김좌진의 북로군정서와 홍범도의 대한독립군 등 연합 부대가 백두산 인근 청산리 일대에서 일본군과 벌인 전투이다. 6일간의 전투에서 대규모 독립군 승리로 기록된다.',
     sourceHighlight: '김좌진의 북로군정서와 홍범도의 대한독립군 등 연합 부대가 청산리 일대에서 일본군과 벌인 전투이다.',
     keyword: '청산리 대첩',
+    references: [
+      { title: '김좌진 장군 기념사업회', url: 'http://www.kimjwajin.org/' },
+      { title: '청산리 대첩 요약 - 우리역사넷', url: 'http://contents.history.go.kr/mobile/nh/view.do?levelId=nh_043_0040_0010_0010' },
+      { title: '나무위키 - 청산리 전투', url: 'https://namu.wiki/w/청산리 전투' }
+    ]
   },
   {
     id: 6,
@@ -76,6 +101,11 @@ const MOCK_QUESTIONS = [
     source: '에빙하우스의 망각곡선 실험에 따르면, 학습 직후 100%였던 기억은 20분 후 약 58%, 1시간 후 약 44%, 24시간 후 약 33%로 떨어진다. 이를 극복하기 위한 전략이 간격 반복(Spaced Repetition)이다.',
     sourceHighlight: '24시간 후 약 33%로 떨어진다.',
     keyword: '망각곡선',
+    references: [
+      { title: '에빙하우스 망각곡선 이론 상세', url: 'https://en.wikipedia.org/wiki/Forgetting_curve' },
+      { title: '기억력을 높이는 4단계 복습법', url: 'https://brunch.co.kr/@learning/12' },
+      { title: '간격 반복 학습의 효과', url: 'https://fs.blog/spacing-effect/' }
+    ]
   },
 ];
 
@@ -202,6 +232,23 @@ const SourcePanel = ({ q }) => (
           : part
       )}
     </p>
+
+    {q.references && q.references.length > 0 && (
+      <>
+        <div className="source-panel__divider" />
+        <div className="source-panel__ref-title">참고내용</div>
+        <div className="source-panel__links">
+          {q.references.slice(0, 3).map((ref, idx) => (
+            <a key={idx} href={ref.url} target="_blank" rel="noopener noreferrer" className="source-ref-link">
+              <span className="source-ref-link__title">{ref.title}</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
+                <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+              </svg>
+            </a>
+          ))}
+        </div>
+      </>
+    )}
   </div>
 );
 

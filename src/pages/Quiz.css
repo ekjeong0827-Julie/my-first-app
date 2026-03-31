@@ -399,6 +399,65 @@
   }
 }
 
+/* ─── 원문 패널 내 참고 링크 ─── */
+.source-panel__divider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0;
+}
+
+.source-panel__ref-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.source-panel__links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.source-ref-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--surface-2);
+  border: 1.2px solid var(--border);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.source-ref-link:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  transform: translateX(4px);
+}
+
+.source-ref-link__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 12px;
+}
+
+.source-ref-link svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.source-ref-link:hover .source-ref-link__title { color: var(--primary); }
+.source-ref-link:hover svg { color: var(--primary); }
+
 /* ─── 하단 CTA ─── */
 .quiz-footer {
   padding: 14px 16px max(env(safe-area-inset-bottom), 80px);
