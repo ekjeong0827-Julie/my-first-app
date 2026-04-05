@@ -94,12 +94,29 @@ const ExamCard = ({ exam, onStart, index }) => {
 };
 
 const ExamList = ({ onNavigate }) => {
-  const [exams, setExams] = useState(INITIAL_EXAMS);
+  const [exams, setExams] = useState(() => {
+    const saved = localStorage.getItem('savedExams');
+    return saved ? JSON.parse(saved) : INITIAL_EXAMS;
+  });
   const [showCreate, setShowCreate] = useState(false);
 
   const handleCreate = (newExam) => {
-    setExams(prev => [{ ...newExam, id: Date.now() }, ...prev]);
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    
+    const newExamWithMeta = { 
+      ...newExam, 
+      id: Date.now(),
+      createdAtFull: timestamp // User requested YYYYMMDDHHMMSS
+    };
+    
+    const updated = [newExamWithMeta, ...exams];
+    setExams(updated);
+    localStorage.setItem('savedExams', JSON.stringify(updated));
     setShowCreate(false);
+    
+    alert(`시험이 생성되었습니다!\n생성일시: ${timestamp}`);
   };
 
   const pending = exams.filter(e => e.status === 'pending');
