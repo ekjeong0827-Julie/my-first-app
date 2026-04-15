@@ -31,6 +31,7 @@ function App() {
   const [activeSummaryId, setActiveSummaryId] = useState(null);
   const [prefilledCategory, setPrefilledCategory] = useState(null);
   const [quizResults, setQuizResults] = useState(null);
+  const [quizQuestions, setQuizQuestions] = useState([]);
   const [tests, setTests] = useState(() => {
     const saved = localStorage.getItem('savedTests');
     return saved ? JSON.parse(saved) : [];
@@ -46,6 +47,7 @@ function App() {
     if (tab === 'summary_detail') setActiveSummaryId(payload);
     if (tab === 'test' && payload) setPrefilledCategory(payload);
     if (tab === 'result') setQuizResults(payload);
+    if (tab === 'quiz' && payload) setQuizQuestions(payload);
   };
 
   const renderContent = () => {
@@ -72,7 +74,12 @@ function App() {
       case 'exam':
         return <ExamList onNavigate={handleNavigate} />;
       case 'quiz':
-        return <Quiz onNavigate={handleNavigate} />;
+        return (
+          <Quiz 
+            onNavigate={handleNavigate} 
+            initialQuestions={quizQuestions} 
+          />
+        );
       case 'study':
         return <StudyList onNavigate={handleNavigate} />;
       case 'mytests':

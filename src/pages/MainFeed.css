@@ -68,16 +68,32 @@
 
 /* ─── Cards ─── */
 .study-card, .exam-card {
-  background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 18px; cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 12px;
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 20px; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden;
 }
-.study-card:hover, .exam-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--primary-light); }
+.study-card:hover, .exam-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0,0,0,0.12); border-color: var(--primary-light); }
 .study-card:active, .exam-card:active { transform: scale(0.98); }
 
-.study-card__title, .exam-card__title { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; line-height: 1.4; }
-.study-card__summary, .exam-card__summary { font-size: 13px; color: var(--text-sub); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* Card Header Row */
+.study-card__header-row, .exam-card__header-row {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: -4px;
+}
+.study-card__tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.study-card__date-simple { font-size: 11px; font-weight: 600; color: var(--text-muted); opacity: 0.8; }
+
+.exam-card__badge-pill {
+  background: var(--primary); color: white; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.exam-card__count-tag {
+  font-size: 11px; font-weight: 700; color: var(--primary); background: var(--primary-light); padding: 2px 8px; border-radius: 10px;
+}
+
+.study-card__title, .exam-card__title { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.4px; line-height: 1.4; }
+.study-card__summary, .exam-card__summary { font-size: 13px; color: var(--text-sub); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+.exam-card__summary { display: flex; align-items: center; color: var(--primary); font-weight: 600; font-size: 12px; }
 
 .study-card__footer, .exam-card__footer { display: flex; align-items: center; justify-content: flex-end; margin-top: 4px; }
-.study-card__actions { display: flex; align-items: center; gap: 8px; }
+.study-card__actions { display: flex; align-items: center; gap: 8px; width: 100%; justify-content: flex-end; }
 
 .study-card__cta, .exam-card__cta {
   display: flex; align-items: center; gap: 6px; background: var(--primary-light); color: var(--primary); font-size: 13px; font-weight: 700; padding: 8px 14px; border-radius: 20px; transition: all 0.15s ease;

@@ -253,8 +253,10 @@ const SourcePanel = ({ q }) => (
 );
 
 /* ─── 메인 컴포넌트 ─── */
-const Quiz = ({ onNavigate, examConfig }) => {
-  const questions = MOCK_QUESTIONS;
+const Quiz = ({ onNavigate, examConfig, initialQuestions }) => {
+  const questions = initialQuestions && initialQuestions.length > 0 
+    ? initialQuestions 
+    : MOCK_QUESTIONS;
   const total = questions.length;
 
   const [idx, setIdx]           = useState(0);

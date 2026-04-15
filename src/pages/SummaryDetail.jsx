@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '../supabaseClient';
+import { generateQuestions } from '../aiService';
 import './SummaryDetail.css';
 
 const SummaryDetail = ({ activeSummaryId, onNavigate }) => {
   const [study, setStudy] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     const fetchStudyDetail = async () => {
@@ -29,6 +31,21 @@ const SummaryDetail = ({ activeSummaryId, onNavigate }) => {
 
     fetchStudyDetail();
   }, [activeSummaryId]);
+
+  const handleCreateQuestions = async () => {
+    if (!study || !study.summary) return;
+    
+    setIsGenerating(true);
+    try {
+      const questions = await generateQuestions(study.summary, { count: 6, type: 'mixed' });
+      onNavigate('quiz', questions);
+    } catch (error) {
+      console.error('Failed to generate questions:', error);
+      alert('문제 생성에 실패했습니다. 다시 시도해 주세요.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   if (loading) return <div className="detail-container">로딩 중...</div>;
   if (!study) return <div className="detail-container">자료를 불러올 수 없습니다.</div>;
@@ -63,13 +80,18 @@ const SummaryDetail = ({ activeSummaryId, onNavigate }) => {
       </div>
 
       <button 
-        className="generate-floating-btn" 
-        onClick={() => onNavigate('test', study.category)}
+        className={`generate-floating-btn ${isGenerating ? 'loading' : ''}`} 
+        onClick={handleCreateQuestions}
+        disabled={isGenerating}
         title="이 자료로 문제 출제하기"
       >
-        <svg viewBox="0 0 24 24">
-          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-        </svg>
+        {isGenerating ? (
+          <div className="btn-spinner" />
+        ) : (
+          <svg viewBox="0 0 24 24">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+          </svg>
+        )}
       </button>
     </div>
   );

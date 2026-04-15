@@ -79,7 +79,14 @@ const StudyCard = ({ item, onNavigate, index, onDelete }) => {
       role="button"
       tabIndex={0}
     >
-      <div className="study-card__content">
+      <div className="study-card__header-row">
+        <div className="study-card__tags">
+          {item.tags && item.tags.map(tag => <Tag key={tag} label={tag} />)}
+        </div>
+        <span className="study-card__date-simple">{item.date}</span>
+      </div>
+
+      <div className="study-card__body">
         <h2 className="study-card__title">{item.title}</h2>
         <p className="study-card__summary">{item.summary}</p>
       </div>
@@ -93,7 +100,7 @@ const StudyCard = ({ item, onNavigate, index, onDelete }) => {
               onNavigate && onNavigate('summary_detail', item.id);
             }}
           >
-            이어 학습
+            학습하기
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6"/>
             </svg>
@@ -126,9 +133,20 @@ const ExamCard = ({ item, onNavigate, index }) => {
       role="button"
       tabIndex={0}
     >
-      <div className="exam-card__content">
+      <div className="exam-card__header-row">
+        <span className="exam-card__badge-pill">시험</span>
+        {item.questionCount && <span className="exam-card__count-tag">{item.questionCount}문항</span>}
+      </div>
+
+      <div className="exam-card__body">
         <h2 className="exam-card__title">{item.title}</h2>
-        <p className="exam-card__summary">{item.studyTitle || '이 시험에 대한 설명이 없습니다.'}</p>
+        <p className="exam-card__summary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="12" height="12" style={{ marginRight: 4, opacity: 0.6 }}>
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          {item.studyTitle || '관련 학습 자료'}
+        </p>
       </div>
 
       <div className="exam-card__footer">
@@ -139,7 +157,7 @@ const ExamCard = ({ item, onNavigate, index }) => {
             onNavigate && onNavigate('quiz', item.id);
           }}
         >
-          시험 시작
+          응시하기
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="9 18 15 12 9 6"/>
           </svg>

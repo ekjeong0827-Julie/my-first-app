@@ -62,3 +62,67 @@ export const generateSummary = async (title, category, content = "") => {
     return `[AI 요약 서비스 안내]\n\n현재 서비스 연결에 어려움이 있습니다. \n\n**에러 내용**: ${error.message}\n\n**대처 방법**:\n1. Google AI Studio에서 API 키가 활성화되었는지 확인\n2. 'Generative Language API' 권한 확인\n\n임시로 제목 기반의 기본 학습 가이드를 생성합니다:\n- **${title}** 관련 핵심 개념 정리\n- **${category}** 빈출 키워드 체크`;
   }
 };
+/**
+ * 학습 요약본을 바탕으로 퀴즈 문제 세트를 생성합니다.
+ * @param {string} summary - 요약 내용
+ * @param {object} config - 문항 수, 유형 등 설정
+ */
+export const generateQuestions = async (summary, config = { count: 5, type: 'mixed' }) => {
+  if (!API_KEY) {
+    console.warn("Gemini API Key가 설정되지 않았습니다. Mock 퀴즈를 반환합니다.");
+    return []; // Quiz.jsx에서 보완 처리
+  }
+
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    const prompt = `
+      당신은 전문 출제 위원입니다. 다음 학습 요약 내용을 바탕으로 학습 효과를 극대화할 수 있는 퀴즈 문항 ${config.count}개를 생성해 주세요.
+      
+      [요약 내용]
+      ${summary}
+      
+      [요구 사항]
+      1. 문항 유형: ${config.type === 'mixed' ? '객관식(mc4, mc5), O/X(ox), 단답형(short) 중에서 골고루 섞어서' : config.type}
+      2. 반드시 다음 JSON 배열 형식으로만 응답하세요. (다른 설명 금지)
+      
+      JSON 구조 예시:
+      [
+        {
+          "id": 1,
+          "type": "ox",
+          "question": "문항 내용",
+          "answer": true,
+          "source": "정답 근거가 되는 원문 문장",
+          "sourceHighlight": "원문 중 핵심 구문",
+          "keyword": "핵심 키워드"
+        },
+        {
+          "id": 2,
+          "type": "mc4",
+          "question": "객관식 문항",
+          "options": ["보기1", "보기2", "보기3", "보기4"],
+          "answer": 2, 
+          "source": "근거 문장",
+          "sourceHighlight": "핵심 구문",
+          "keyword": "키워드"
+        }
+      ]
+      
+      * mc4/mc5의 answer는 0부터 시작하는 인덱스 번호여야 합니다.
+      * ox의 answer는 boolean(true/false)이어야 합니다.
+      * short의 answer는 정답 문자열이어야 합니다.
+    `;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    // JSON 추출 (Markdown 코드 블록 제거 등)
+    const jsonStr = text.match(/\[[\s\S]*\]/)?.[0] || text;
+    return JSON.parse(jsonStr);
+  } catch (error) {
+    console.error("Question generation error:", error);
+    throw error;
+  }
+};
