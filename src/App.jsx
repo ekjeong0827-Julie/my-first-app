@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import MainFeed from './pages/MainFeed';
 import FileUpload from './pages/FileUpload';
@@ -9,9 +9,23 @@ import SummaryDetail from './pages/SummaryDetail';
 import ExamList from './pages/ExamList';
 import Quiz from './pages/Quiz';
 import ResultReport from './pages/ResultReport';
+import StudyList from './pages/StudyList';
 import './index.css';
 
 function App() {
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('vibeFeedTheme') || 'light';
+  });
+
+  useEffect(() => {
+    document.body.setAttribute('data-theme', theme);
+    localStorage.setItem('vibeFeedTheme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
   const [activeTab, setActiveTab] = useState('home');
   const [activeTestId, setActiveTestId] = useState(null);
   const [activeSummaryId, setActiveSummaryId] = useState(null);
@@ -60,7 +74,7 @@ function App() {
       case 'quiz':
         return <Quiz onNavigate={handleNavigate} />;
       case 'study':
-        return <MyTests tests={tests} onNavigate={handleNavigate} />;
+        return <StudyList onNavigate={handleNavigate} />;
       case 'mytests':
         return <MyTests tests={tests} onNavigate={handleNavigate} />;
       case 'solve':
@@ -95,7 +109,12 @@ function App() {
 
   return (
     <div className="mobile-container">
-      <Layout activeTab={activeTab} onNavigate={handleNavigate}>
+      <Layout 
+        activeTab={activeTab} 
+        onNavigate={handleNavigate}
+        theme={theme}
+        toggleTheme={toggleTheme}
+      >
         {renderContent()}
       </Layout>
     </div>

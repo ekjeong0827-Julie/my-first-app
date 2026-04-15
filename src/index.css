@@ -1,68 +1,72 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
 
-/* ─── Design Tokens ─── */
+/* ─── Design Tokens (MZ Generation Neon & Glass) ─── */
 :root {
-  --primary: #2962FF;
-  --primary-dark: #1A237E;
-  --primary-light: #E8EEFF;
-  --primary-glow: rgba(41, 98, 255, 0.18);
+  /* Vibrant Light Mode */
+  --primary: #db00ff; /* Electric Purple */
+  --primary-dark: #a900c7;
+  --primary-light: #f7d9ff;
+  --primary-glow: rgba(219, 0, 255, 0.25);
 
-  --success: #00C853;
+  --accent: #ccff00; /* Neon Lime */
+
+  --success: #00E676;
   --success-bg: #E8FBF0;
-  --danger: #FF5252;
-  --danger-bg: #FFF0F0;
-  --warning-bg: #FFF9C4;
+  --danger: #FF3366;
+  --danger-bg: #FFEAF0;
+  --warning-bg: #FFF5CC;
 
-  --bg: #F8F9FA;
-  --surface: #FFFFFF;
-  --surface-2: #F0F4FF;
-  --border: #E8ECF4;
+  --bg: #F2F4F8; /* Cool light grey */
+  --surface: rgba(255, 255, 255, 0.75); /* Glassmorphism base */
+  --surface-2: rgba(255, 255, 255, 0.9);
+  --border: rgba(0, 0, 0, 0.08);
 
-  --text: #0F1D3B;
-  --text-sub: #4A5578;
-  --text-muted: #8A94B2;
+  --text: #050511;
+  --text-sub: #404055;
+  --text-muted: #7A7A90;
 
-  --shadow-sm: 0 1px 3px rgba(15, 29, 59, 0.06);
-  --shadow-md: 0 4px 16px rgba(15, 29, 59, 0.10);
-  --shadow-lg: 0 12px 40px rgba(41, 98, 255, 0.15);
-  --shadow-card: 0 2px 12px rgba(15, 29, 59, 0.08);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 16px 40px rgba(219, 0, 255, 0.15);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.06);
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
 
-  --nav-height: 72px;
+  --nav-height: 80px; /* Slightly taller for rounded modern look */
+  --glass-blur: blur(16px);
 }
 
-/* ─── Dark Mode ─── */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --primary: #5C8CFF;
-    --primary-dark: #3D5AFE;
-    --primary-light: #1A2140;
-    --primary-glow: rgba(92, 140, 255, 0.20);
+/* ─── Manual Dark Mode ─── */
+body[data-theme="dark"] {
+  --primary: #ff00ff; /* Magenta glow */
+  --primary-dark: #cc00cc;
+  --primary-light: #2d0033;
+  --primary-glow: rgba(255, 0, 255, 0.35);
 
-    --success: #00E676;
-    --success-bg: #0A2A1A;
-    --danger: #FF6B6B;
-    --danger-bg: #2A0A0A;
-    --warning-bg: #2A2400;
+  --accent: #ccff00; /* Neon Lime pops on dark */
 
-    --bg: #0B0F1A;
-    --surface: #131929;
-    --surface-2: #1A2140;
-    --border: #232D4A;
+  --success: #00FF88;
+  --success-bg: #00331A;
+  --danger: #FF4D79;
+  --danger-bg: #330011;
+  --warning-bg: #332B00;
 
-    --text: #EEF2FF;
-    --text-sub: #9AABD4;
-    --text-muted: #546080;
+  --bg: #09090D; /* Deep dark void */
+  --surface: rgba(25, 25, 30, 0.65); /* Dark Glass */
+  --surface-2: rgba(35, 35, 45, 0.8);
+  --border: rgba(255, 255, 255, 0.08);
 
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 12px 40px rgba(92, 140, 255, 0.15);
-    --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.3);
-  }
+  --text: #FFFFFF;
+  --text-sub: #B0B0C0;
+  --text-muted: #65657D;
+
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 16px 40px rgba(255, 0, 255, 0.2);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 /* ─── Reset ─── */

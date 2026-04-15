@@ -8,9 +8,17 @@ const NavItem = ({ children, label, active, onClick }) => (
   </button>
 );
 
-const Layout = ({ children, activeTab, onNavigate }) => {
+const Layout = ({ children, activeTab, onNavigate, theme, toggleTheme }) => {
   return (
     <div className="layout">
+      {/* Theme Toggle Button */}
+      <button 
+        className="theme-toggle" 
+        onClick={toggleTheme} 
+        aria-label="모드 전환"
+      >
+        {theme === 'dark' ? '☀️' : '🌙'}
+      </button>
       <main className="layout__main">
         {children}
       </main>

@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
+import { supabase } from '../supabaseClient';
+import { generateSummary } from '../aiService';
 import './FileUpload.css';
 
 const FileUpload = ({ onNavigate, onAddSummary }) => {
   const [file, setFile] = useState(null);
   const [category, setCategory] = useState('');
+  const [materialName, setMaterialName] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [status, setStatus] = useState('');
+  const [progress, setProgress] = useState(0);
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -23,39 +28,81 @@ const FileUpload = ({ onNavigate, onAddSummary }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) return alert('파일을 먼저 등록해주세요.');
+    if (!materialName.trim()) return alert('학습자료명을 입력해주세요.');
     if (!category) return alert('카테고리를 선택해주세요.');
+    if (!file) return alert('파일을 먼저 등록해주세요.');
     
     setIsUploading(true);
-    // Mock upload
-    setTimeout(() => {
-      setIsUploading(false);
-      
-      const fileTitle = file.name.replace(/\.[^/.]+$/, "");
-      if (onAddSummary) {
-        onAddSummary({
-          tags: [category],
-          title: fileTitle,
-          summary: '방금 등록하신 자료를 AI가 분석하여 도출한 핵심 요약입니다.',
-          date: '방금 전'
-        });
-      }
 
-      alert('자료 등록 및 요약 정리가 완료되었습니다!');
+    try {
+      // 1. AI 연결 중
+      setStatus('AI 엔진에 연결 중...');
+      setProgress(20);
+      await new Promise(res => setTimeout(res, 800)); // 시각적 효과를 위한 지연
+
+      // 2. 학습자료 전달 중
+      setStatus('학습자료 전달 중...');
+      setProgress(40);
+      await new Promise(res => setTimeout(res, 800));
+
+      // 3. 요약 분석 중
+      setStatus('핵심 내용 요약 분석 중...');
+      setProgress(70);
+      const aiSummary = await generateSummary(materialName.trim(), category);
+
+      // 4. 저장 및 완료
+      setStatus('분석 결과 저장 및 완료 중...');
+      setProgress(90);
+      const { error } = await supabase
+        .from('study')
+        .insert([
+          {
+            study_name: materialName.trim(),
+            category: category,
+            filename: file.name,
+            summary: aiSummary
+          }
+        ]);
+
+      if (error) throw error;
+      
+      setProgress(100);
+      setStatus('요약 결과 완료!');
+      await new Promise(res => setTimeout(res, 500));
+      
       onNavigate('home');
-    }, 1000);
+    } catch (error) {
+      console.error('Error in processing:', error);
+      alert('처리에 실패했습니다: ' + error.message);
+    } finally {
+      setIsUploading(false);
+      setStatus('');
+      setProgress(0);
+    }
   };
 
   return (
     <div className="upload-container">
       <div className="upload-header">
-        <h1 className="upload-title">시험 자료 등록</h1>
+        <h1 className="upload-title">학습자료 등록</h1>
         <p className="upload-subtitle">공부할 자료(PDF, DOCX)를 올려주시면 AI가 중점내용을 요약해드립니다.</p>
       </div>
 
       <form className="upload-form" onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label className="form-label">학습자료명</label>
+          <input 
+            type="text"
+            className="form-input"
+            value={materialName}
+            onChange={e => setMaterialName(e.target.value)}
+            placeholder="자료의 이름을 입력하세요"
+            required
+          />
+        </div>
+
         <div className="form-group">
           <label className="form-label">카테고리 선택</label>
           <select 
@@ -113,12 +160,21 @@ const FileUpload = ({ onNavigate, onAddSummary }) => {
           </div>
         </div>
 
+        {isUploading && (
+          <div className="progress-overlay">
+            <span className="status-text">{status}</span>
+            <div className="progress-container">
+              <div className="progress-fill" style={{ width: `${progress}%` }}></div>
+            </div>
+          </div>
+        )}
+
         <button 
           type="submit" 
           className={`submit-btn ${isUploading ? 'loading' : ''}`}
           disabled={isUploading}
         >
-          {isUploading ? '요약 정리 중...' : '자료 등록 및 시작하기'}
+          {isUploading ? '분석 중...' : '자료 등록 및 시작하기'}
         </button>
       </form>
     </div>

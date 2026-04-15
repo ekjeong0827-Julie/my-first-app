@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../supabaseClient';
 import './MainFeed.css';
 
 /* ── Mock data ── */
@@ -69,74 +70,76 @@ const Tag = ({ label }) => {
   );
 };
 
-const ProgressRing = ({ percent }) => {
-  const r = 18;
-  const c = 2 * Math.PI * r;
-  const filled = c - (c * percent) / 100;
-  return (
-    <svg className="progress-ring" viewBox="0 0 44 44" width="44" height="44">
-      <circle cx="22" cy="22" r={r} className="progress-ring__track" />
-      <circle
-        cx="22"
-        cy="22"
-        r={r}
-        className="progress-ring__fill"
-        strokeDasharray={c}
-        strokeDashoffset={filled}
-        transform="rotate(-90 22 22)"
-      />
-      <text x="22" y="22" className="progress-ring__text" dominantBaseline="central" textAnchor="middle">
-        {percent}%
-      </text>
-    </svg>
-  );
-};
-
-const StudyCard = ({ item, onNavigate, index }) => {
-  const isCompleted = item.progress === 100;
+const StudyCard = ({ item, onNavigate, index, onDelete }) => {
   return (
     <div
-      className={`study-card animate-fade-up ${isCompleted ? 'study-card--done' : ''}`}
+      className="study-card animate-fade-up"
       style={{ animationDelay: `${index * 60}ms` }}
       onClick={() => onNavigate && onNavigate('summary_detail', item.id)}
       role="button"
       tabIndex={0}
     >
-      <div className="study-card__top">
-        <div className="study-card__tags">
-          {item.tags.map(t => <Tag key={t} label={t} />)}
-        </div>
-        <ProgressRing percent={item.progress} />
-      </div>
-
-      <h2 className="study-card__title">{item.title}</h2>
-      <p className="study-card__summary">{item.summary}</p>
-
-      <div className="study-card__bar-wrap">
-        <div className="study-card__bar">
-          <div className="study-card__bar-fill" style={{ width: `${item.progress}%` }} />
-        </div>
-        <span className="study-card__bar-label">{item.solvedQuiz}/{item.totalQuiz} 문제</span>
+      <div className="study-card__content">
+        <h2 className="study-card__title">{item.title}</h2>
+        <p className="study-card__summary">{item.summary}</p>
       </div>
 
       <div className="study-card__footer">
-        <div className="study-card__meta">
-          {item.badge && <span className="study-card__badge">{item.badge}</span>}
-          <span className="study-card__date">{item.date}</span>
-          {item.score !== null && (
-            <span className="study-card__score" style={{ color: item.score >= 80 ? 'var(--success)' : 'var(--danger)' }}>
-              {item.score}점
-            </span>
-          )}
+        <div className="study-card__actions">
+          <button
+            className="study-card__cta"
+            onClick={e => {
+              e.stopPropagation();
+              onNavigate && onNavigate('summary_detail', item.id);
+            }}
+          >
+            이어 학습
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+          <button
+            className="study-card__delete"
+            onClick={e => {
+              e.stopPropagation();
+              onDelete && onDelete(item.id, item.title);
+            }}
+            aria-label="삭제"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
         </div>
+      </div>
+    </div>
+  );
+};
+
+const ExamCard = ({ item, onNavigate, index }) => {
+  return (
+    <div
+      className="exam-card animate-fade-up"
+      style={{ animationDelay: `${index * 60}ms` }}
+      onClick={() => onNavigate && onNavigate('quiz', item.id)}
+      role="button"
+      tabIndex={0}
+    >
+      <div className="exam-card__content">
+        <h2 className="exam-card__title">{item.title}</h2>
+        <p className="exam-card__summary">{item.studyTitle || '이 시험에 대한 설명이 없습니다.'}</p>
+      </div>
+
+      <div className="exam-card__footer">
         <button
-          className="study-card__cta"
+          className="exam-card__cta"
           onClick={e => {
             e.stopPropagation();
-            onNavigate && onNavigate(isCompleted ? 'mytests' : 'summary_detail', item.id);
+            onNavigate && onNavigate('quiz', item.id);
           }}
         >
-          {isCompleted ? '다시 풀기' : '이어 학습'}
+          시험 시작
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="9 18 15 12 9 6"/>
           </svg>
@@ -172,10 +175,83 @@ const RemindBanner = ({ count, onNavigate }) => {
   );
 };
 
-const MainFeed = ({ summaries, onNavigate }) => {
-  const sessions = STUDY_SESSIONS_DATA;
-  const ongoing = sessions.filter(s => s.progress < 100);
-  const completed = sessions.filter(s => s.progress === 100);
+const MainFeed = ({ onNavigate }) => {
+  const [sessions, setSessions] = useState([]);
+  const [exams, setExams] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 학습 세션 삭제하기
+  const handleDelete = async (id, title) => {
+    if (window.confirm(`'${title}' 학습 자료를 삭제하시겠습니까?`)) {
+      try {
+        const { error } = await supabase
+          .from('study')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+        
+        alert('삭제완료 되었습니다.');
+        fetchSessions();
+      } catch (error) {
+        console.error('Error deleting session:', error);
+        alert('삭제에 실패했습니다.');
+      }
+    }
+  };
+
+  // 학습 세션 데이터 가져오기 (Supabase)
+  const fetchSessions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('study')
+        .select('*')
+        .order('createtime', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedData = data.map(item => ({
+        id: item.id,
+        tags: [item.category],
+        title: item.study_name,
+        summary: item.summary || '요약 내용을 생성 중이거나 내용이 없습니다.', 
+        date: new Date(item.createtime).toLocaleDateString(),
+      }));
+
+      setSessions(formattedData);
+    } catch (error) {
+      console.error('Error fetching study sessions:', error);
+    }
+  };
+
+  // 시험 데이터 가져오기 (LocalStorage)
+  const fetchExams = () => {
+    const saved = localStorage.getItem('savedExams');
+    const examsData = saved ? JSON.parse(saved) : [];
+    setExams(examsData);
+  };
+
+  useEffect(() => {
+    const init = async () => {
+      setLoading(true);
+      await fetchSessions();
+      fetchExams();
+      setLoading(false);
+    };
+    init();
+
+    const channel = supabase
+      .channel('public:study_home')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'study' }, (payload) => {
+        fetchSessions();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   const accuracy = Math.round((TODAY_STATS.correct / TODAY_STATS.solved) * 100);
 
   return (
@@ -208,40 +284,41 @@ const MainFeed = ({ summaries, onNavigate }) => {
         {/* Remind Banner */}
         <RemindBanner count={TODAY_STATS.reminds} onNavigate={onNavigate} />
 
-        {/* Ongoing */}
-        {ongoing.length > 0 && (
-          <section className="feed__section">
-            <div className="feed__section-header">
-              <h2 className="feed__section-title">진행 중인 학습</h2>
-              <span className="feed__section-badge">{ongoing.length}</span>
-            </div>
-            {ongoing.map((item, i) => (
-              <StudyCard key={item.id} item={item} onNavigate={onNavigate} index={i} />
-            ))}
-          </section>
-        )}
-
-        {/* Completed */}
-        {completed.length > 0 && (
-          <section className="feed__section">
-            <div className="feed__section-header">
-              <h2 className="feed__section-title">완료된 학습</h2>
-              <span className="feed__section-badge feed__section-badge--done">{completed.length}</span>
-            </div>
-            {completed.map((item, i) => (
-              <StudyCard key={item.id} item={item} onNavigate={onNavigate} index={i} />
-            ))}
-          </section>
-        )}
-
-        {/* Empty State */}
-        {sessions.length === 0 && (
-          <div className="feed__empty animate-fade-up">
-            <div className="feed__empty-icon">📚</div>
-            <h3>아직 학습 자료가 없어요</h3>
-            <p>아래 + 버튼을 눌러 첫 학습을 시작해보세요!</p>
+        {/* 나의 학습 */}
+        <section className="feed__section">
+          <div className="feed__section-header">
+            <h2 className="feed__section-title">나의 학습</h2>
+            <span className="feed__section-badge">{sessions.length}</span>
           </div>
-        )}
+          {sessions.length > 0 ? (
+            sessions.slice(0, 3).map((item, i) => (
+              <StudyCard key={item.id} item={item} onNavigate={onNavigate} onDelete={handleDelete} index={i} />
+            ))
+          ) : (
+            <div className="feed__empty-inline">아직 학습 자료가 없습니다.</div>
+          )}
+          {sessions.length > 3 && (
+            <button className="feed__more-btn" onClick={() => onNavigate('study')}>학습 전체 보기</button>
+          )}
+        </section>
+
+        {/* 나의 시험 */}
+        <section className="feed__section">
+          <div className="feed__section-header">
+            <h2 className="feed__section-title">나의 시험</h2>
+            <span className="feed__section-badge feed__section-badge--done">{exams.length}</span>
+          </div>
+          {exams.length > 0 ? (
+            exams.slice(0, 3).map((item, i) => (
+              <ExamCard key={item.id} item={item} onNavigate={onNavigate} index={i} />
+            ))
+          ) : (
+            <div className="feed__empty-inline">아직 생성된 시험이 없습니다.</div>
+          )}
+          {exams.length > 3 && (
+            <button className="feed__more-btn" onClick={() => onNavigate('exam')}>시험 전체 보기</button>
+          )}
+        </section>
       </div>
     </div>
   );

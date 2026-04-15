@@ -1,22 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { supabase } from '../supabaseClient';
 import './SummaryDetail.css';
 
-const SummaryDetail = ({ activeSummary, onNavigate, onStartGeneration }) => {
-  if (!activeSummary) {
-    return <div>자료를 불러올 수 없습니다.</div>;
-  }
+const SummaryDetail = ({ activeSummaryId, onNavigate }) => {
+  const [study, setStudy] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Fallback details if mock doesn't have it
-  const details = activeSummary.details || [
-    {
-      heading: '1. 구조 미파악된 핵심 강령',
-      points: ['업로드 시 AI가 세부 분석을 진행중이거나 처리하지 못했습니다.', '기본 요약을 바탕으로 출제를 할 수 있습니다.']
-    }
-  ];
+  useEffect(() => {
+    const fetchStudyDetail = async () => {
+      if (!activeSummaryId) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('study')
+          .select('*')
+          .eq('id', activeSummaryId)
+          .single();
+
+        if (error) throw error;
+        setStudy(data);
+      } catch (error) {
+        console.error('Error fetching study detail:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudyDetail();
+  }, [activeSummaryId]);
+
+  if (loading) return <div className="detail-container">로딩 중...</div>;
+  if (!study) return <div className="detail-container">자료를 불러올 수 없습니다.</div>;
 
   return (
     <div className="detail-container">
-      <button className="back-btn" onClick={() => onNavigate('summary')}>
+      <button className="back-btn" onClick={() => onNavigate('home')}>
         <svg viewBox="0 0 24 24">
           <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
         </svg>
@@ -25,44 +44,27 @@ const SummaryDetail = ({ activeSummary, onNavigate, onStartGeneration }) => {
 
       <div className="detail-header">
         <div className="detail-tags">
-          {activeSummary.tags.map(tag => (
-            <span key={tag} className="tag">{tag}</span>
-          ))}
+          <span className="tag">{study.category}</span>
         </div>
-        <h1 className="detail-title">{activeSummary.title}</h1>
-        <div className="card-date">{activeSummary.date} 등록됨</div>
+        <h1 className="detail-title">{study.study_name}</h1>
+        <div className="card-date">{new Date(study.createtime).toLocaleDateString()} 등록됨</div>
       </div>
 
-      <div className="detail-toc">
-        <h2 className="toc-title">
-          <svg viewBox="0 0 24 24">
-            <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+      <div className="detail-content ai-summary">
+        <h2 className="content-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
-          요약 목차 (TOC)
+          AI 핵심 요약
         </h2>
-        <ul className="toc-list">
-          {details.map((section, idx) => (
-            <li key={idx} className="toc-item">{section.heading}</li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="detail-content">
-        {details.map((section, idx) => (
-          <div key={idx} className="content-section">
-            <h3 className="section-heading">{section.heading}</h3>
-            <ul className="section-points">
-              {section.points.map((point, pIdx) => (
-                <li key={pIdx}>{point}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        <div className="markdown-body">
+          <ReactMarkdown>{study.summary || "요약된 내용이 없습니다."}</ReactMarkdown>
+        </div>
       </div>
 
       <button 
         className="generate-floating-btn" 
-        onClick={() => onStartGeneration(activeSummary.tags[0])}
+        onClick={() => onNavigate('test', study.category)}
         title="이 자료로 문제 출제하기"
       >
         <svg viewBox="0 0 24 24">
