@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ExamCreate from './ExamCreate';
+import { supabase } from '../supabaseClient';
+import { generateQuestions } from '../aiService';
 import './ExamList.css';
 
 /* ── Mock study sessions (shared source of truth would come from context/state) ── */
@@ -94,29 +96,119 @@ const ExamCard = ({ exam, onStart, index }) => {
 };
 
 const ExamList = ({ onNavigate }) => {
-  const [exams, setExams] = useState(() => {
-    const saved = localStorage.getItem('savedExams');
-    return saved ? JSON.parse(saved) : INITIAL_EXAMS;
-  });
+  const [exams, setExams] = useState([]);
   const [showCreate, setShowCreate] = useState(false);
+  const [studySessions, setStudySessions] = useState([]);
 
-  const handleCreate = (newExam) => {
-    const now = new Date();
-    const pad = (n) => String(n).padStart(2, '0');
-    const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-    
-    const newExamWithMeta = { 
-      ...newExam, 
-      id: Date.now(),
-      createdAtFull: timestamp // User requested YYYYMMDDHHMMSS
+  // 시험 데이터 가져오기 (Supabase)
+  const fetchExams = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('exams')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      // DB 필드명을 컴포넌트 내부 형식에 맞게 일부 조정 (필요시)
+      const formatted = data.map(e => ({
+        ...e,
+        studyTitle: e.study_title,
+        questionCount: e.question_count,
+        questionType: e.question_type,
+        answerMode: e.answer_mode
+      }));
+      
+      setExams(formatted);
+    } catch (error) {
+      console.error('Error fetching exams:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchExams();
+    // ... 기존 studySessions 가져오기 로직 유지
+  }, []);
+
+  useEffect(() => {
+    const fetchStudySessions = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('study')
+          .select('*')
+          .order('createtime', { ascending: false });
+
+        if (error) throw error;
+        
+        // ExamCreate가 기대하는 형식으로 변환
+        const formatted = data.map(s => ({
+          id: s.id,
+          title: s.study_name,
+          tags: [s.category]
+        }));
+        
+        setStudySessions(formatted);
+      } catch (error) {
+        console.error('Error fetching study sessions:', error);
+      }
     };
-    
-    const updated = [newExamWithMeta, ...exams];
-    setExams(updated);
-    localStorage.setItem('savedExams', JSON.stringify(updated));
-    setShowCreate(false);
-    
-    alert(`시험이 생성되었습니다!\n생성일시: ${timestamp}`);
+
+    fetchStudySessions();
+  }, []);
+
+  const handleCreate = async (newExam) => {
+    try {
+      // 1. 해당 학습자료의 상세 정보(원본 파일 등) 가져오기
+      const { data: study, error } = await supabase
+        .from('study')
+        .select('*')
+        .eq('id', newExam.studyId)
+        .single();
+      
+      if (error) throw error;
+
+      // 2. AI에게 문제 출제 요청
+      const questions = await generateQuestions(study.summary, {
+        count: newExam.questionCount,
+        type: newExam.questionType,
+        fileData: study.file_content ? {
+          data: study.file_content,
+          mimeType: study.mime_type
+        } : null
+      });
+
+      if (!questions || questions.length === 0) {
+        throw new Error("AI가 문제를 생성하지 못했습니다. 할당량 초과이거나 자료가 부족할 수 있습니다.");
+      }
+
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+      
+      // Supabase에 시험 저장
+      const { error: insertError } = await supabase
+        .from('exams')
+        .insert([{
+          title: newExam.title,
+          study_title: newExam.studyTitle,
+          study_id: newExam.studyId,
+          question_count: newExam.questionCount,
+          question_type: newExam.questionType,
+          answer_mode: newExam.answerMode,
+          questions: questions,
+          created_at_full: timestamp
+        }]);
+
+      if (insertError) throw insertError;
+
+      fetchExams(); // 목록 새로고침
+      setShowCreate(false);
+      
+      alert(`시험이 생성되었습니다!\n출제된 문항 수: ${questions.length}개\n생성일시: ${timestamp}`);
+    } catch (error) {
+      console.error('Core generation error:', error);
+      throw error; 
+    }
   };
 
   const pending = exams.filter(e => e.status === 'pending');
@@ -164,7 +256,7 @@ const ExamList = ({ onNavigate }) => {
                 <span className="exam-section__count">{pending.length}</span>
               </div>
               {pending.map((exam, i) => (
-                <ExamCard key={exam.id} exam={exam} onStart={(e, mode) => onNavigate('quiz', e.id)} index={i} />
+                <ExamCard key={exam.id} exam={exam} onStart={(e, mode) => onNavigate('quiz', e.questions)} index={i} />
               ))}
             </section>
           )}
@@ -177,7 +269,7 @@ const ExamList = ({ onNavigate }) => {
                 <span className="exam-section__count exam-section__count--done">{done.length}</span>
               </div>
               {done.map((exam, i) => (
-                <ExamCard key={exam.id} exam={exam} onStart={(e, mode) => onNavigate('quiz', e.id)} index={i} />
+                <ExamCard key={exam.id} exam={exam} onStart={(e, mode) => onNavigate('quiz', e.questions)} index={i} />
               ))}
             </section>
           )}
@@ -200,7 +292,7 @@ const ExamList = ({ onNavigate }) => {
         <ExamCreate
           onClose={() => setShowCreate(false)}
           onCreate={handleCreate}
-          studySessions={STUDY_SESSIONS}
+          studySessions={studySessions}
         />
       )}
     </>

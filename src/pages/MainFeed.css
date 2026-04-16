@@ -93,7 +93,7 @@
 .exam-card__summary { display: flex; align-items: center; color: var(--primary); font-weight: 600; font-size: 12px; }
 
 .study-card__footer, .exam-card__footer { display: flex; align-items: center; justify-content: flex-end; margin-top: 4px; }
-.study-card__actions { display: flex; align-items: center; gap: 8px; width: 100%; justify-content: flex-end; }
+.study-card__actions, .exam-card__actions { display: flex; align-items: center; gap: 8px; width: 100%; justify-content: flex-end; }
 
 .study-card__cta, .exam-card__cta {
   display: flex; align-items: center; gap: 6px; background: var(--primary-light); color: var(--primary); font-size: 13px; font-weight: 700; padding: 8px 14px; border-radius: 20px; transition: all 0.15s ease;
@@ -102,12 +102,12 @@
 .study-card__cta:hover, .exam-card__cta:hover { background: var(--primary); color: white; }
 .study-card__cta:hover svg, .exam-card__cta:hover svg { stroke: white; }
 
-.study-card__delete {
+.study-card__delete, .exam-card__delete {
   display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: var(--danger-light); color: var(--danger); transition: all 0.2s ease;
 }
-.study-card__delete svg { width: 16px; height: 16px; stroke: var(--danger); stroke-width: 2.2; }
-.study-card__delete:hover { background: var(--danger); color: white; }
-.study-card__delete:hover svg { stroke: white; }
+.study-card__delete svg, .exam-card__delete svg { width: 16px; height: 16px; stroke: var(--danger); stroke-width: 2.2; }
+.study-card__delete:hover, .exam-card__delete:hover { background: var(--danger); color: white; }
+.study-card__delete:hover svg, .exam-card__delete:hover svg { stroke: white; }
 
 /* ─── Utils ─── */
 .feed__empty-inline { padding: 20px; text-align: center; color: var(--text-muted); font-size: 14px; background: var(--surface-2); border-radius: var(--radius-md); border: 1px dashed var(--border); }

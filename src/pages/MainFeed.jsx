@@ -124,7 +124,7 @@ const StudyCard = ({ item, onNavigate, index, onDelete }) => {
   );
 };
 
-const ExamCard = ({ item, onNavigate, index }) => {
+const ExamCard = ({ item, onNavigate, index, onDelete }) => {
   return (
     <div
       className="exam-card animate-fade-up"
@@ -150,18 +150,33 @@ const ExamCard = ({ item, onNavigate, index }) => {
       </div>
 
       <div className="exam-card__footer">
-        <button
-          className="exam-card__cta"
-          onClick={e => {
-            e.stopPropagation();
-            onNavigate && onNavigate('quiz', item.id);
-          }}
-        >
-          응시하기
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6"/>
-          </svg>
-        </button>
+        <div className="exam-card__actions">
+          <button
+            className="exam-card__cta"
+            onClick={e => {
+              e.stopPropagation();
+              onNavigate && onNavigate('quiz', item.questions);
+            }}
+          >
+            응시하기
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+          <button
+            className="exam-card__delete"
+            onClick={e => {
+              e.stopPropagation();
+              onDelete && onDelete(item.id, item.title);
+            }}
+            aria-label="시험 삭제"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -218,6 +233,26 @@ const MainFeed = ({ onNavigate }) => {
     }
   };
 
+  // 시험 삭제하기 (Supabase)
+  const handleDeleteExam = async (id, title) => {
+    if (window.confirm(`'${title}' 시험을 삭제하시겠습니까?`)) {
+      try {
+        const { error } = await supabase
+          .from('exams')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+        
+        alert('삭제되었습니다.');
+        fetchExams();
+      } catch (error) {
+        console.error('Error deleting exam:', error);
+        alert('삭제에 실패했습니다.');
+      }
+    }
+  };
+
   // 학습 세션 데이터 가져오기 (Supabase)
   const fetchSessions = async () => {
     try {
@@ -242,31 +277,57 @@ const MainFeed = ({ onNavigate }) => {
     }
   };
 
-  // 시험 데이터 가져오기 (LocalStorage)
-  const fetchExams = () => {
-    const saved = localStorage.getItem('savedExams');
-    const examsData = saved ? JSON.parse(saved) : [];
-    setExams(examsData);
+  // 시험 데이터 가져오기 (Supabase)
+  const fetchExams = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('exams')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formatted = data.map(e => ({
+        ...e,
+        studyTitle: e.study_title,
+        questionCount: e.question_count,
+        questionType: e.question_type,
+        answerMode: e.answer_mode,
+        date: new Date(e.created_at).toLocaleDateString()
+      }));
+
+      setExams(formatted);
+    } catch (error) {
+      console.error('Error fetching exams:', error);
+    }
   };
 
   useEffect(() => {
     const init = async () => {
       setLoading(true);
       await fetchSessions();
-      fetchExams();
+      await fetchExams();
       setLoading(false);
     };
     init();
 
-    const channel = supabase
+    const studyChannel = supabase
       .channel('public:study_home')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'study' }, (payload) => {
         fetchSessions();
       })
       .subscribe();
 
+    const examChannel = supabase
+      .channel('public:exams_home')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'exams' }, (payload) => {
+        fetchExams();
+      })
+      .subscribe();
+
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(studyChannel);
+      supabase.removeChannel(examChannel);
     };
   }, []);
 
@@ -328,7 +389,7 @@ const MainFeed = ({ onNavigate }) => {
           </div>
           {exams.length > 0 ? (
             exams.slice(0, 3).map((item, i) => (
-              <ExamCard key={item.id} item={item} onNavigate={onNavigate} index={i} />
+              <ExamCard key={item.id} item={item} onNavigate={onNavigate} onDelete={handleDeleteExam} index={i} />
             ))
           ) : (
             <div className="feed__empty-inline">아직 생성된 시험이 없습니다.</div>

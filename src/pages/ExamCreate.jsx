@@ -52,6 +52,9 @@ const ExamCreate = ({ onClose, onCreate, studySessions = [] }) => {
     title: '',
   });
   const [mounted, setMounted] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [status, setStatus] = useState('');
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     setMounted(true);
@@ -82,25 +85,53 @@ const ExamCreate = ({ onClose, onCreate, studySessions = [] }) => {
     else handleClose();
   };
 
-  const handleSubmit = () => {
-    const selectedStudy = studySessions.find(s => s.id === form.studyId);
-    const typeLabel = QUESTION_TYPES.find(t => t.id === form.questionType)?.label ?? '';
-    const modeLabel = ANSWER_MODES.find(m => m.id === form.answerMode)?.label ?? '';
-    const examTitle = form.title.trim()
-      || `${selectedStudy?.tags?.[0] ?? '시험'} ${form.questionCount}문제 시험`;
+  const handleSubmit = async () => {
+    setIsGenerating(true);
+    setStatus('AI 엔진 최적화 중...');
+    setProgress(15);
+    
+    try {
+      const selectedStudy = studySessions.find(s => s.id === form.studyId);
+      const typeLabel = QUESTION_TYPES.find(t => t.id === form.questionType)?.label ?? '';
+      const modeLabel = ANSWER_MODES.find(m => m.id === form.answerMode)?.label ?? '';
+      const examTitle = form.title.trim()
+        || `${selectedStudy?.tags?.[0] ?? '시험'} ${form.questionCount}문제 시험`;
 
-    onCreate({
-      title: examTitle,
-      studyTitle: selectedStudy?.title ?? '',
-      studyId: form.studyId,
-      questionCount: form.questionCount,
-      questionType: typeLabel,
-      answerMode: modeLabel,
-      createdAt: new Date().toISOString().split('T')[0],
-      status: 'pending',
-      score: null,
-    });
-    setMounted(false);
+      setStatus('학습 자료 맥락 분석 중...');
+      setProgress(40);
+      
+      // onCreate에서 실제로 AI 호출(generateQuestions)을 수행하므로 상태를 분배합니다.
+      // (ExamList.jsx가 비동기로 작동하므로 완료될 때까지 기다림)
+      const mockProgress = setInterval(() => {
+        setProgress(prev => (prev < 90 ? prev + 5 : prev));
+      }, 1000);
+
+      await onCreate({
+        title: examTitle,
+        studyTitle: selectedStudy?.title ?? '',
+        studyId: form.studyId,
+        questionCount: form.questionCount,
+        questionType: typeLabel,
+        answerMode: modeLabel,
+        createdAt: new Date().toISOString().split('T')[0],
+        status: 'pending',
+        score: null,
+      });
+
+      clearInterval(mockProgress);
+      setProgress(100);
+      setStatus('시험 문제 생성 완료!');
+      await new Promise(res => setTimeout(res, 500));
+      
+      setMounted(false);
+    } catch (error) {
+      console.error('Generation failed:', error);
+      alert('시험 생성에 실패했습니다.\n사유: ' + error.message);
+    } finally {
+      setIsGenerating(false);
+      setStatus('');
+      setProgress(0);
+    }
   };
 
   const STEPS = ['학습 선택', '문제 수', '문제 유형', '답변보기'];
@@ -273,18 +304,33 @@ const ExamCreate = ({ onClose, onCreate, studySessions = [] }) => {
         {/* Footer CTA */}
         <div className="ec-footer">
           <button
-            className="ec-cta"
+            className={`ec-cta ${isGenerating ? 'loading' : ''}`}
             onClick={handleNext}
-            disabled={!canProceed()}
+            disabled={!canProceed() || isGenerating}
           >
-            {step === 3 ? '시험 생성하기 🎯' : '다음'}
-            {step < 3 && (
+            {isGenerating ? 'AI가 시험 문제를 출제 중입니다...' : (step === 3 ? '시험 생성하기 🎯' : '다음')}
+            {!isGenerating && step < 3 && (
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
                 <polyline points="9 18 15 12 9 6"/>
               </svg>
             )}
           </button>
         </div>
+        
+        {isGenerating && (
+          <div className="ec-generating-overlay">
+            <div className="ec-progress-panel">
+              <div className="ec-loader-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <span className="ec-status-text">{status}</span>
+              <div className="ec-progress-bar">
+                <div className="ec-progress-fill" style={{ width: `${progress}%` }} />
+              </div>
+              <p className="ec-generating-hint">지정하신 {form.questionCount}문항을 AI가 정성껏 출제 중입니다.</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

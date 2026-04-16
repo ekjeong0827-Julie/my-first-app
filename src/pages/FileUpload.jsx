@@ -28,6 +28,19 @@ const FileUpload = ({ onNavigate, onAddSummary }) => {
     }
   };
 
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        // "data:application/pdf;base64,..."에서 데이터 부분만 추출
+        const base64 = reader.result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!materialName.trim()) return alert('학습자료명을 입력해주세요.');
@@ -50,7 +63,13 @@ const FileUpload = ({ onNavigate, onAddSummary }) => {
       // 3. 요약 분석 중
       setStatus('핵심 내용 요약 분석 중...');
       setProgress(70);
-      const aiSummary = await generateSummary(materialName.trim(), category);
+      
+      const fileData = {
+        data: await fileToBase64(file),
+        mimeType: file.type || 'application/pdf'
+      };
+
+      const aiSummary = await generateSummary(materialName.trim(), category, fileData);
 
       // 4. 저장 및 완료
       setStatus('분석 결과 저장 및 완료 중...');
@@ -62,7 +81,9 @@ const FileUpload = ({ onNavigate, onAddSummary }) => {
             study_name: materialName.trim(),
             category: category,
             filename: file.name,
-            summary: aiSummary
+            summary: aiSummary,
+            file_content: fileData.data, // 원본 파일의 base64 데이터 저장
+            mime_type: fileData.mimeType
           }
         ]);
 
