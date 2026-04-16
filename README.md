@@ -1,16 +1,21 @@
-# React + Vite
+# Perfect Score (백점 앱)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Perfect Score**는 AI가 학습 자료를 분석해 핵심 요약과 인출 퀴즈를 자동 생성하는 앱입니다. 능동적인 퀴즈 풀이와 원문 역추적 피드백으로 지식을 장기 기억화하며, 방대한 공부량을 효율적으로 마스터하고 완벽한 시험 대비를 돕습니다.
 
-Currently, two official plugins are available:
+## ✨ 주요 기능
+- **스마트 분석:** PDF 및 텍스트 자료를 AI가 즉시 분석
+- **계층적 요약:** 학습 내용을 구조적으로 정리한 요약본 제공
+- **인출 퀴즈:** 객관식, O/X 등 다양한 유형의 3단계 퀴즈 자동 생성
+- **역추적 피드백:** 퀴즈 오답 시 자료 원문의 맥락을 즉시 확인
+- **복습 시스템:** 취약한 개념을 별도의 복습 카드로 관리
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🛠 Tech Stack
+- **Frontend:** React, Vite, Vanilla CSS
+- **Backend/DB:** Supabase
+- **AI:** Gemini AI (Google Cloud)
+- **Deployment:** Vercel
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 시작하기
+1. 환경 변수 설정 (`.env.local` 생성)
+2. `npm install`
+3. `npm run dev`
