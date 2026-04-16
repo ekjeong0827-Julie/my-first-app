@@ -3,10 +3,10 @@
 /* ─── Design Tokens (MZ Generation Neon & Glass) ─── */
 :root {
   /* Vibrant Light Mode */
-  --primary: #db00ff; /* Electric Purple */
-  --primary-dark: #a900c7;
-  --primary-light: #f7d9ff;
-  --primary-glow: rgba(219, 0, 255, 0.25);
+  --primary: #3B82F6; /* Modern Blue */
+  --primary-dark: #1E3A8A;
+  --primary-light: #EFF6FF;
+  --primary-glow: rgba(59, 130, 246, 0.25);
 
   --accent: #ccff00; /* Neon Lime */
 
@@ -27,7 +27,7 @@
 
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 16px 40px rgba(219, 0, 255, 0.15);
+  --shadow-lg: 0 16px 40px rgba(59, 130, 246, 0.15);
   --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.06);
 
   --radius-sm: 12px;
@@ -41,10 +41,10 @@
 
 /* ─── Manual Dark Mode ─── */
 body[data-theme="dark"] {
-  --primary: #ff00ff; /* Magenta glow */
-  --primary-dark: #cc00cc;
-  --primary-light: #2d0033;
-  --primary-glow: rgba(255, 0, 255, 0.35);
+  --primary: #60A5FA; /* Sky Blue glow */
+  --primary-dark: #2563EB;
+  --primary-light: #1E3A8A;
+  --primary-glow: rgba(96, 165, 250, 0.35);
 
   --accent: #ccff00; /* Neon Lime pops on dark */
 
@@ -65,7 +65,7 @@ body[data-theme="dark"] {
 
   --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.5);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 16px 40px rgba(255, 0, 255, 0.2);
+  --shadow-lg: 0 16px 40px rgba(96, 165, 250, 0.2);
   --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
