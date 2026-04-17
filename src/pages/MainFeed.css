@@ -68,7 +68,7 @@
 
 /* ─── Cards ─── */
 .study-card, .exam-card {
-  background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 20px; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 14px; position: relative; overflow: hidden;
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 20px; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden;
 }
 .study-card:hover, .exam-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0,0,0,0.12); border-color: var(--primary-light); }
 .study-card:active, .exam-card:active { transform: scale(0.98); }
@@ -92,7 +92,7 @@
 
 .exam-card__summary { display: flex; align-items: center; color: var(--primary); font-weight: 600; font-size: 12px; }
 
-.study-card__footer, .exam-card__footer { display: flex; align-items: center; justify-content: flex-end; margin-top: 4px; }
+.study-card__footer, .exam-card__footer { display: flex; align-items: center; justify-content: flex-end; margin-top: 0; }
 .study-card__actions, .exam-card__actions { display: flex; align-items: center; gap: 8px; width: 100%; justify-content: flex-end; }
 
 .study-card__cta, .exam-card__cta {

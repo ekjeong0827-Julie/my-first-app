@@ -13,19 +13,6 @@ import StudyList from './pages/StudyList';
 import './index.css';
 
 function App() {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('vibeFeedTheme') || 'light';
-  });
-
-  useEffect(() => {
-    document.body.setAttribute('data-theme', theme);
-    localStorage.setItem('vibeFeedTheme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
-
   const [activeTab, setActiveTab] = useState('home');
   const [activeTestId, setActiveTestId] = useState(null);
   const [activeSummaryId, setActiveSummaryId] = useState(null);
@@ -119,8 +106,6 @@ function App() {
       <Layout 
         activeTab={activeTab} 
         onNavigate={handleNavigate}
-        theme={theme}
-        toggleTheme={toggleTheme}
       >
         {renderContent()}
       </Layout>

@@ -1,13 +1,73 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '../supabaseClient';
 import { generateQuestions } from '../aiService';
 import './SummaryDetail.css';
 
+const SlideToComplete = ({ onComplete, isCompleted }) => {
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [translateX, setTranslateX] = useState(0);
+  const trackRef = useRef(null);
+
+  const handleStart = (e) => {
+    if (isCompleted) return;
+    setIsDragging(true);
+    setStartX(e.type === 'touchstart' ? e.touches[0].clientX : e.clientX);
+  };
+
+  const handleMove = (e) => {
+    if (!isDragging || isCompleted) return;
+    const currentX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+    const diff = currentX - startX;
+    const maxSlide = trackRef.current.offsetWidth - 32; // 28px circle + 4px margin
+    const newTranslate = Math.max(0, Math.min(diff, maxSlide));
+    setTranslateX(newTranslate);
+  };
+
+  const handleEnd = () => {
+    if (!isDragging || isCompleted) return;
+    setIsDragging(false);
+    const maxSlide = trackRef.current.offsetWidth - 32;
+    if (translateX > maxSlide * 0.7) {
+      setTranslateX(maxSlide);
+      onComplete();
+    } else {
+      setTranslateX(0);
+    }
+  };
+
+  return (
+    <div 
+      className={`slide-track ${isCompleted ? 'completed' : ''}`} 
+      ref={trackRef}
+      onMouseMove={handleMove}
+      onMouseUp={handleEnd}
+      onMouseLeave={handleEnd}
+      onTouchMove={handleMove}
+      onTouchEnd={handleEnd}
+    >
+      <div 
+        className="slide-handle"
+        style={{ transform: `translateX(${isCompleted ? 'calc(100% - 32px)' : translateX + 'px'})` }}
+        onMouseDown={handleStart}
+        onTouchStart={handleStart}
+      >
+        {isCompleted ? '✓' : '〉'}
+      </div>
+      <span className="slide-text">
+        {isCompleted ? '완료' : '학습완료'}
+      </span>
+    </div>
+  );
+};
+
+
 const SummaryDetail = ({ activeSummaryId, onNavigate }) => {
   const [study, setStudy] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [completedSections, setCompletedSections] = useState({});
 
   useEffect(() => {
     const fetchStudyDetail = async () => {
@@ -60,11 +120,11 @@ const SummaryDetail = ({ activeSummaryId, onNavigate }) => {
       </button>
 
       <div className="detail-header">
-        <div className="detail-tags">
-          <span className="tag">{study.category}</span>
-        </div>
         <h1 className="detail-title">{study.study_name}</h1>
-        <div className="card-date">{new Date(study.createtime).toLocaleDateString()} 등록됨</div>
+        <div className="detail-meta">
+          <span className="tag">{study.category}</span>
+          <span className="detail-date">{new Date(study.createtime).toLocaleDateString()} 등록됨</span>
+        </div>
       </div>
 
       <div className="detail-content ai-summary">
@@ -75,7 +135,25 @@ const SummaryDetail = ({ activeSummaryId, onNavigate }) => {
           AI 핵심 요약
         </h2>
         <div className="markdown-body">
-          <ReactMarkdown>{study.summary || "요약된 내용이 없습니다."}</ReactMarkdown>
+          {(() => {
+            const content = study.summary || "요약된 내용이 없습니다.";
+            // Split by ## Heading
+            const sections = content.split(/(?=^##\s)/m);
+            
+            return sections.map((section, idx) => (
+              <div key={idx} className="summary-section">
+                <ReactMarkdown>{section}</ReactMarkdown>
+                {section.trim() && (idx > 0 || sections.length === 1) && (
+                  <div className="section-footer">
+                    <SlideToComplete 
+                      isCompleted={completedSections[idx]} 
+                      onComplete={() => setCompletedSections(prev => ({ ...prev, [idx]: true }))} 
+                    />
+                  </div>
+                )}
+              </div>
+            ));
+          })()}
         </div>
       </div>
 
