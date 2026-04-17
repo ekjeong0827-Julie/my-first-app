@@ -1,14 +1,15 @@
 .layout {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100%;
+  width: 100%;
   position: relative;
 }
 
 .layout__main {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: calc(var(--nav-height) + 16px);
+  padding-bottom: calc(var(--nav-height) + 24px);
   -webkit-overflow-scrolling: touch;
 }
 
@@ -16,27 +17,19 @@
 .bottom-nav {
   position: fixed;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
   width: 100%;
-  max-width: 480px;
   height: var(--nav-height);
-  background: var(--surface);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border-top: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border-light);
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: 0 8px;
-  z-index: 100;
-  box-shadow: 0 -4px 24px rgba(15, 29, 59, 0.08);
-}
-
-@media (prefers-color-scheme: dark) {
-  .bottom-nav {
-    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.4);
-  }
+  padding: 0 12px 12px; /* Extra padding for bottom curve */
+  z-index: 1000;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.02);
 }
 
 /* Nav items */
@@ -45,16 +38,16 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 8px 16px;
-  border-radius: var(--radius-sm);
+  padding: 8px;
+  border-radius: var(--radius-md);
   color: var(--text-muted);
-  transition: color 0.2s ease, transform 0.15s ease;
+  transition: all 0.2s ease;
   position: relative;
   flex: 1;
 }
 
 .nav-item:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
 }
 
 .nav-item--active {
@@ -63,79 +56,70 @@
 
 .nav-item--active .nav-icon svg {
   stroke: var(--primary);
+  fill: var(--primary-light);
 }
 
 .nav-icon {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  transition: all 0.2s ease;
 }
 
 .nav-icon svg {
   width: 22px;
   height: 22px;
   stroke: currentColor;
-  transition: stroke 0.2s ease;
-}
-
-.nav-item--active .nav-icon::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--primary);
+  stroke-width: 2;
+  transition: all 0.2s ease;
 }
 
 .nav-label {
   font-size: 10px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 /* FAB spacer */
 .nav-fab-spacer {
-  flex: 1;
+  width: 64px;
+  flex-shrink: 0;
   pointer-events: none;
 }
 
-/* Center FAB */
+/* Center FAB - More sophisticated */
 .nav-fab {
   position: absolute;
   left: 50%;
-  transform: translateX(-50%) translateY(-24px);
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  transform: translateX(-50%) translateY(-28px);
+  width: 54px;
+  height: 54px;
+  border-radius: 18px; /* Squircle style */
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-lg);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  animation: pulse-glow 2.5s ease-in-out infinite;
+  box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .nav-fab svg {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   stroke: white;
+  stroke-width: 2.5;
 }
 
 .nav-fab:hover {
-  transform: translateX(-50%) translateY(-28px) scale(1.06);
-  box-shadow: 0 16px 48px rgba(41, 98, 255, 0.36);
+  transform: translateX(-50%) translateY(-32px);
+  box-shadow: 0 12px 28px rgba(5, 150, 105, 0.4);
 }
 
 .nav-fab:active {
-  transform: translateX(-50%) translateY(-24px) scale(0.94);
+  transform: translateX(-50%) translateY(-28px) scale(0.92);
 }
-
-

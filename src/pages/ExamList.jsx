@@ -45,7 +45,7 @@ const STATUS_MAP = {
 const ExamCard = ({ exam, onStart, index }) => {
   const s = STATUS_MAP[exam.status];
   return (
-    <div className="exam-card animate-fade-up" style={{ animationDelay: `${index * 60}ms` }}>
+    <div className="exam-card animate-fade-up cursor-pointer" style={{ animationDelay: `${index * 60}ms` }}>
       <div className="exam-card__header">
         <div className="exam-card__meta-row">
           <span className="exam-card__status-badge" style={{ color: s.color, background: s.bg }}>
@@ -76,7 +76,7 @@ const ExamCard = ({ exam, onStart, index }) => {
         {exam.status === 'done' ? (
           <>
             <button className="exam-btn exam-btn--ghost" onClick={() => onStart(exam, 'retry')}>
-              다시 풀기
+              응시하기
             </button>
             <button className="exam-btn exam-btn--primary" onClick={() => onStart(exam, 'review')}>
               오답 복습
@@ -84,7 +84,7 @@ const ExamCard = ({ exam, onStart, index }) => {
           </>
         ) : (
           <button className="exam-btn exam-btn--primary exam-btn--full" onClick={() => onStart(exam, 'start')}>
-            시험 시작
+            응시하기
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6"/>
             </svg>
@@ -133,24 +133,39 @@ const ExamList = ({ onNavigate }) => {
   useEffect(() => {
     const fetchStudySessions = async () => {
       try {
+        if (!supabase) return;
         const { data, error } = await supabase
           .from('study')
           .select('*')
           .order('createtime', { ascending: false });
 
-        if (error) throw error;
+        if (error) {
+          if (error.message.includes('column "createtime" does not exist')) {
+             const { data: retryData, error: retryError } = await supabase
+               .from('study')
+               .select('*')
+               .order('created_at', { ascending: false });
+             if (retryError) throw retryError;
+             updateStudySessionsState(retryData);
+             return;
+          }
+          throw error;
+        }
         
-        // ExamCreate가 기대하는 형식으로 변환
-        const formatted = data.map(s => ({
-          id: s.id,
-          title: s.study_name,
-          tags: [s.category]
-        }));
-        
-        setStudySessions(formatted);
+        updateStudySessionsState(data);
       } catch (error) {
         console.error('Error fetching study sessions:', error);
       }
+    };
+
+    const updateStudySessionsState = (data) => {
+      if (!data) return;
+      const formatted = data.map(s => ({
+        id: s.id,
+        title: s.study_name,
+        tags: [s.category]
+      }));
+      setStudySessions(formatted);
     };
 
     fetchStudySessions();
@@ -276,7 +291,12 @@ const ExamList = ({ onNavigate }) => {
 
           {exams.length === 0 && (
             <div className="exam-empty animate-fade-up">
-              <div className="exam-empty__icon">📋</div>
+              <div className="placeholder-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="48" height="48">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                </svg>
+              </div>
               <h3>아직 만든 시험이 없어요</h3>
               <p>학습 자료를 기반으로 시험을 만들어보세요!</p>
               <button className="exam-btn exam-btn--primary" onClick={() => setShowCreate(true)}>

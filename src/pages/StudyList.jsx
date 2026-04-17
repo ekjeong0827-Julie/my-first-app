@@ -51,7 +51,7 @@ const StudyCard = ({ item, onNavigate, index, onDelete }) => {
   const isCompleted = item.progress === 100;
   return (
     <div
-      className={`study-card animate-fade-up ${isCompleted ? 'study-card--done' : ''}`}
+      className={`study-card animate-fade-up cursor-pointer ${isCompleted ? 'study-card--done' : ''}`}
       style={{ animationDelay: `${index * 60}ms` }}
       onClick={() => onNavigate && onNavigate('summary_detail', item.id)}
       role="button"
@@ -87,7 +87,7 @@ const StudyCard = ({ item, onNavigate, index, onDelete }) => {
               onNavigate && onNavigate(isCompleted ? 'mytests' : 'summary_detail', item.id);
             }}
           >
-            {isCompleted ? '다시 풀기' : '이어 학습'}
+            학습하기
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6"/>
             </svg>
@@ -117,33 +117,52 @@ const StudyList = ({ onNavigate }) => {
 
   const fetchSessions = async () => {
     try {
+      if (!supabase) return;
       setLoading(true);
+      
       const { data, error } = await supabase
         .from('study')
         .select('*')
         .order('createtime', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes('column "createtime" does not exist')) {
+           const { data: retryData, error: retryError } = await supabase
+             .from('study')
+             .select('*')
+             .order('created_at', { ascending: false });
+           if (retryError) throw retryError;
+           updateSessionState(retryData);
+           return;
+        }
+        throw error;
+      }
 
-      const formattedData = data.map(item => ({
-        id: item.id,
-        tags: [item.category],
-        title: item.study_name,
-        summary: item.summary || '요약 내용을 생성 중이거나 내용이 없습니다.', 
-        progress: 0, 
-        totalQuiz: 10,
-        solvedQuiz: 0,
-        date: new Date(item.createtime).toLocaleDateString(),
-        score: null,
-        badge: null,
-      }));
-
-      setSessions(formattedData);
+      updateSessionState(data);
     } catch (error) {
       console.error('Error fetching study sessions:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateSessionState = (data) => {
+    if (!data) return;
+    const formattedData = data.map(item => ({
+      id: item.id,
+      tags: item.category ? [item.category] : [],
+      title: item.study_name || '제목 없음',
+      summary: item.summary || '요약 내용을 생성 중이거나 내용이 없습니다.', 
+      progress: 0, 
+      totalQuiz: 10,
+      solvedQuiz: 0,
+      date: item.createtime || item.created_at 
+        ? new Date(item.createtime || item.created_at).toLocaleDateString() 
+        : '날짜 정보 없음',
+      score: null,
+      badge: null,
+    }));
+    setSessions(formattedData);
   };
 
   const handleDelete = async (id, title) => {
@@ -245,7 +264,12 @@ const StudyList = ({ onNavigate }) => {
 
             {sessions.length === 0 && (
               <div className="study-empty animate-fade-up">
-                <div className="study-empty__icon">📚</div>
+                <div className="placeholder-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="48" height="48">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                  </svg>
+                </div>
                 <h3>아직 학습 자료가 없어요</h3>
                 <p>새 학습 추가 버튼을 눌러 첫 학습을 시작해보세요!</p>
               </div>

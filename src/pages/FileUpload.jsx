@@ -182,10 +182,16 @@ const FileUpload = ({ onNavigate, onAddSummary }) => {
         </div>
 
         {isUploading && (
-          <div className="progress-overlay">
-            <span className="status-text">{status}</span>
-            <div className="progress-container">
-              <div className="progress-fill" style={{ width: `${progress}%` }}></div>
+          <div className="ec-generating-overlay">
+            <div className="ec-progress-panel">
+              <div className="ec-loader-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <span className="ec-status-text">{status}</span>
+              <div className="ec-progress-bar">
+                <div className="ec-progress-fill" style={{ width: `${progress}%` }}></div>
+              </div>
+              <p className="ec-generating-hint">AI가 학습자료를 꼼꼼하게 분석하여 요약 중입니다.</p>
             </div>
           </div>
         )}

@@ -7,8 +7,8 @@
 
 /* ─── Header ─── */
 .exam-list__header {
-  background: linear-gradient(160deg, #1A237E 0%, #283593 60%, var(--primary) 100%);
-  padding: 52px 20px 24px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  padding: 48px 24px 32px;
   position: relative;
   overflow: hidden;
 }
@@ -16,10 +16,10 @@
 .exam-list__header::before {
   content: '';
   position: absolute;
-  width: 180px; height: 180px;
+  width: 260px; height: 260px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.06);
-  top: -40px; right: -30px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+  top: -80px; right: -60px;
   pointer-events: none;
 }
 
@@ -240,35 +240,33 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  font-size: 14px;
+  gap: 4px;
+  font-size: 13px;
   font-weight: 700;
-  padding: 11px 18px;
-  border-radius: 12px;
+  padding: 8px 14px;
+  border-radius: 20px;
   transition: all 0.15s ease;
 }
 
-.exam-btn svg { width: 16px; height: 16px; }
+.exam-btn svg { width: 14px; height: 14px; }
 
 .exam-btn--primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: #fff;
-  box-shadow: 0 4px 16px var(--primary-glow);
+  background: var(--primary-light);
+  color: var(--primary);
 }
 
-.exam-btn--primary:hover { filter: brightness(1.08); }
-.exam-btn--primary:active { transform: scale(0.95); }
-.exam-btn--primary:disabled {
-  background: var(--border);
-  color: var(--text-muted);
-  box-shadow: none;
-  cursor: not-allowed;
+.exam-btn--primary:hover {
+  background: var(--primary);
+  color: white;
 }
+.exam-btn--primary:hover svg { stroke: white; }
+
+.exam-btn--primary:active { transform: scale(0.95); }
 
 .exam-btn--ghost {
   background: var(--surface-2);
   color: var(--text-sub);
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
 }
 .exam-btn--ghost:hover  { border-color: var(--primary); color: var(--primary); }
 .exam-btn--ghost:active { transform: scale(0.95); }
